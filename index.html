@@ -57,29 +57,29 @@
     fetch('karaokedata.json')
       .then(response => response.json())
       .then(data => {
-        // Groepeer de nummers per collection (bijv. "2000 hits", "ALL CLASSICS")
         const groupedData = {};
-        data.forEach(song => {
+
+        data.forEach((song, index) => {
+          // Indien er geen id aanwezig is, gebruik dan index+1
+          if (!song.id) {
+            song.id = index + 1;
+          }
           if (!groupedData[song.collection]) {
             groupedData[song.collection] = [];
           }
           groupedData[song.collection].push(song);
         });
         
-        // Maak de HTML-output
         const container = document.getElementById('songs-container');
         for (const collection in groupedData) {
-          // Maak een kopje voor de collectie
           const h2 = document.createElement('h2');
           h2.textContent = collection;
           container.appendChild(h2);
-          
-          // Maak een lijst (ul) voor de nummers
+
           const ul = document.createElement('ul');
           groupedData[collection].forEach(song => {
             const li = document.createElement('li');
             li.className = 'song';
-            // We tonen hier de id (nummer), titel en de collectie
             li.innerHTML = `<span class="number">${song.id}.</span> <span class="title">${song.titel}</span> <span class="collection">[${song.collection}]</span>`;
             ul.appendChild(li);
           });
