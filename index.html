@@ -15,6 +15,7 @@
     h2 {
       margin-top: 40px;
       font-size: 1.4em;
+      color: #444;
     }
     ul {
       list-style: none;
@@ -27,6 +28,15 @@
       border-radius: 4px;
       box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
+    .song span {
+      display: inline-block;
+      vertical-align: middle;
+    }
+    .song .number {
+      font-weight: bold;
+      margin-right: 5px;
+      color: #555;
+    }
     .song .title {
       font-weight: bold;
       color: #333;
@@ -34,52 +44,46 @@
     .song .collection {
       font-size: 0.9em;
       color: #777;
+      margin-left: 10px;
     }
   </style>
 </head>
 <body>
   <h1>Karaoke Nummers</h1>
-
+  <div id="songs-container"></div>
+  
   <script>
-    // JSON laden uit extern bestand
+    // Laad de JSON-data uit het externe bestand 'karaokedata.json'
     fetch('karaokedata.json')
       .then(response => response.json())
       .then(data => {
-        // 1. Groepeer de nummers per 'collection' (bijv. "2000 hits", "ALL CLASSICS")
+        // Groepeer de nummers per collection (bijv. "2000 hits", "ALL CLASSICS")
         const groupedData = {};
-
         data.forEach(song => {
-          // Als de key nog niet bestaat, maak je een lege array aan
           if (!groupedData[song.collection]) {
             groupedData[song.collection] = [];
           }
-          // Voeg dit nummer toe aan de array voor deze collectie
           groupedData[song.collection].push(song);
         });
-
-        // 2. Maak voor elke collectie een kopje (h2) en een ul-lijst
-        for (const collectionName in groupedData) {
-          // Maak een subkop (h2) voor de collectie
+        
+        // Maak de HTML-output
+        const container = document.getElementById('songs-container');
+        for (const collection in groupedData) {
+          // Maak een kopje voor de collectie
           const h2 = document.createElement('h2');
-          h2.textContent = collectionName;  // Bijv. "2000 hits" of "ALL CLASSICS"
-          document.body.appendChild(h2);
-
-          // Maak een ul-lijst
+          h2.textContent = collection;
+          container.appendChild(h2);
+          
+          // Maak een lijst (ul) voor de nummers
           const ul = document.createElement('ul');
-
-          // Voeg elk nummer als <li> toe
-          groupedData[collectionName].forEach(song => {
+          groupedData[collection].forEach(song => {
             const li = document.createElement('li');
-            li.classList.add('song');
-            li.innerHTML = `
-              <span class="title">${song.titel}</span>
-              <span class="collection">[${song.collection}]</span>
-            `;
+            li.className = 'song';
+            // We tonen hier de id (nummer), titel en de collectie
+            li.innerHTML = `<span class="number">${song.id}.</span> <span class="title">${song.titel}</span> <span class="collection">[${song.collection}]</span>`;
             ul.appendChild(li);
           });
-
-          // Voeg de ul toe aan de pagina
-          document.body.appendChild(ul);
+          container.appendChild(ul);
         }
       })
       .catch(error => console.error('Fout bij laden van JSON:', error));
